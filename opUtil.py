@@ -35,6 +35,19 @@ def getCurrentLayerOpNum ():
     else:
         newOpNum = rs.GetInteger("Add layers to option number:", number = 1, minimum = 1)
         return newOpNum
+def selObjByUserTextVal(objs, val):
+    """
+    get objects from a list that have a UserText matching the value specified(val)
+    
+    input: list of objs (objs), value to find (int)
+    returns: list of matching objs
+    """
+    matchingObjs = []
+    for obj in objs:
+        if (int(rs.GetUserText(obj, "Number"))==val):
+            matchingObjs.append(obj)
+    return matchingObjs
+
 
 if __name__=="__main__":
     #layer = rs.GetLayer()
