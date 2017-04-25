@@ -21,6 +21,21 @@ def getLayerOpNum (layer):
     else: 
         print "This is the root layer"
         return None
+def getCurrentLayerOpNum ():
+    """
+    Get a layers parent option number
+    
+    input: full name string of layer
+    return: int of the option number
+    """
+    layer = rs.CurrentLayer()
+    curOpNum = getLayerOpNum(layer)
+    if curOpNum > 0:
+        return curOpNum
+    else:
+        newOpNum = rs.GetInteger("Add layers to option number:", number = 1, minimum = 1)
+        return newOpNum
 
-layer = rs.GetLayer()
-print getLayerOpNum(layer)
+if __name__=="__main__":
+    #layer = rs.GetLayer()
+    print getCurrentLayerOpNum()
