@@ -33,7 +33,8 @@ def getCurrentLayerOpNum ():
     if curOpNum > 0:
         return curOpNum
     else:
-        newOpNum = rs.GetInteger("Add layers to option number:", number = 1, minimum = 1)
+        newOpNum = rs.RealBox("Add layers to option number:", default_number=1, title = "Option Number", minimum = 1, maximum = 99)
+        #newOpNum = rs.GetInteger("Add layers to option number:", number = 1, minimum = 1)
         return newOpNum
 def selObjByUserTextVal(objs, val):
     """
