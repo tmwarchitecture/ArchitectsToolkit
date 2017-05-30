@@ -22,7 +22,7 @@ def distributeObjs():
     for newItem in newItems:
         sequence.append(newItem[0])
     
-    #rs.DeleteObject(settingout)
+    rs.DeleteObject(settingout)
     
     #make distribute line
     for i in range(0,len(sequence)):
@@ -30,7 +30,6 @@ def distributeObjs():
             stPt = pts[i]
         if sequence[i] == len(sequence)-1:
             endPt = pts[i]
-    #ends = rs.SortPointList([stPt, endPt])
     divisionLine = rs.AddLine(stPt, endPt)
     
     #finalPts = list(reversed(rs.DivideCurve(divisionLine, len(objs)-1)))
@@ -39,7 +38,7 @@ def distributeObjs():
     for i in range(1, len(finalPts)-1):
         vec = rs.VectorCreate(finalPts[i], pts[sequence[i]])
         rs.MoveObject(objs[sequence[i]], vec)
-    #rs.DeleteObject(divisionLine)
+    rs.DeleteObject(divisionLine)
     rs.EnableRedraw(True)
 
 if __name__=="__main__":
