@@ -39,6 +39,12 @@ def getNumFloors():
         return 1
     else:
         return int(a)
+def getFFL():
+    numLevels = rs.GetDocumentData("NumLevels", "NumLevels")
+    FFLs = []
+    for i in range(1, int(numLevels)+1):
+        FFLs.append(rs.GetDocumentData("Levels", "L"+str(i)))
+    return FFLs
 
 if __name__=="__main__":
     func = rs.GetInteger("")
