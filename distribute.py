@@ -3,7 +3,7 @@ import Rhino
 import scriptcontext as sc
 
 def distributeObjs():
-    objs = rs.GetObjects()
+    objs = rs.GetObjects("Choose objects to distribute", preselect = True)
     if objs is None:
         return
     rs.EnableRedraw(False)
