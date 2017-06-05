@@ -53,3 +53,5 @@ if __name__=="__main__":
     if func == 1:
         b = getNumFloors()
         setFloorLevels(b)
+    if func == 2:
+        print getFFL()
