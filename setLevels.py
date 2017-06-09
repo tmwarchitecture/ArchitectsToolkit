@@ -3,7 +3,7 @@ import rhinoscriptsyntax as rs
 def setFloorLevels(numFloors):
     """
     sets the floor levels in document data
-    input: int, the number of floors
+    input: int: the number of floors
     returns: None
     """
     levelNum = []
@@ -25,6 +25,21 @@ def setFloorLevels(numFloors):
     for i in range(0,numFloors):
         rs.SetDocumentData("Levels", levelNum[i], str(newLevels[i]))
     return None
+def getFloorLevels():
+    """
+    get the levels from document data
+    input: None
+    returns: List of levels
+    """
+    numFloors = getNumFloors()
+    levelNum = []
+    levels = []
+    
+    for i in range(0,numFloors):
+        levelNum.append("L"+str(i+1))
+        levels.append(float(rs.GetDocumentData("Levels", levelNum[i])))
+    
+    return levels
 def setNumFloors():
     try:
         curNum = int(rs.GetDocumentData("NumLevels", "NumLevels"))
@@ -39,12 +54,6 @@ def getNumFloors():
         return 1
     else:
         return int(a)
-def getFFL():
-    numLevels = rs.GetDocumentData("NumLevels", "NumLevels")
-    FFLs = []
-    for i in range(1, int(numLevels)+1):
-        FFLs.append(rs.GetDocumentData("Levels", "L"+str(i)))
-    return FFLs
 
 if __name__=="__main__":
     func = rs.GetInteger("")
@@ -54,4 +63,5 @@ if __name__=="__main__":
         b = getNumFloors()
         setFloorLevels(b)
     if func == 2:
-        print getFFL()
+        print getFloorLevels()
+        #setFloorLevels(b)
