@@ -1,6 +1,10 @@
 import rhinoscriptsyntax as rs
 import Rhino
 import datetime
+def diff(list1, list2):
+    c = set(list1).union(set(list2))
+    d = set(list1).intersection(set(list2))
+    return list(c - d)
 def renameToTEN(layers):
     nameDict = {
     "OFFICE_01":"A-AREA-0001-BNDY",
@@ -80,14 +84,20 @@ def exportAllPlansToCAD():
         print "No plans currently cut. Use CutPlans."
     return
 def importTEN_CAD():
-    
     savePath0 = rs.OpenFileName("Open", "Autocad (*.dwg)|*.dwg||")
+    explodeBlockBoo = True
+    if savePath0 is None:
+        return
+    rs.EnableRedraw(False)
+    
+    rs.AddLayer("70_REF")
+    rs.AddLayer("CAD", parent = "70_REF")
     
     fileNameExt = savePath0.split('\\')[-1]
     fileName = fileNameExt.split('.')[0]
     savePath1 = '"'+savePath0+'"'
     
-    
+    #create layer name
     now = datetime.date.today()
     dateList = []
     if len(str(now.month))>1:
@@ -99,14 +109,32 @@ def importTEN_CAD():
     else:
         day = "0"+str(now.day)
     time = str(now.year)+month+day
-    layerName = time+"_"+fileName
+    layerName = time+"_"+fileName+"_01"
+    children = rs.LayerChildren("70_REF::CAD")
+    finalNums = []
+    for child in children:
+        num = rs.LayerName(child, fullpath = False).split("_")[-1]
+        try:
+            finalNums.append(int(num))
+        except:
+            finalNums.append(0)
+    finalNums.sort()
     if rs.IsLayer("70_REF::CAD::"+layerName):
-        layerName = layerName + "_01"
+        num = int(finalNums[-1])+1
+        if len(str(num))<2:
+            finalNum = "0" + str(num)
+        else:
+            finalNum = str(num)
+        layerName = time+"_"+fileName+ "_" + finalNum
     par = rs.AddLayer("70_REF")
     cat = rs.AddLayer("CAD", parent = par)
     element = rs.AddLayer(layerName, parent = cat)
     rs.CurrentLayer(element)
     
+    #get intial list of all layers in the file
+    currentLayers = rs.LayerNames()
+    
+    #
     #rs.UnitSystem(4)
     rs.Command('_-Import '+savePath1+' _Enter')
     #rs.Command('_selLast')
@@ -114,7 +142,25 @@ def importTEN_CAD():
     #rs.ScaleObjects(objs, [0,0,0], [.001,.001,0], copy=False)
     #rs.UnitSystem(2)
     
+    #get new layers added
+    endLayersNames = rs.LayerNames()
+    #newLayers = [item for item in currentLayers if item not in endLayersNames]
+    newLayers = diff(endLayersNames, currentLayers)
+    print newLayers
+    for layer in newLayers:
+        rs.ParentLayer(layer, element)
+        objects = rs.ObjectsByLayer(layer)
+        if rs.IsLayerEmpty(layer):
+            rs.DeleteLayer(layer)
+        else:
+            for obj in objects:
+                if rs.IsDimension(obj):
+                    rs.DeleteObject(obj)
+                elif rs.IsHatch(obj):
+                    rs.DeleteObject(obj)
+    #Rhino.DocObjects.Layer.IsExpanded(
     print "Import EXECUTED"
+    rs.EnableRedraw(True)
     return None
 
 if __name__=="__main__":
