@@ -13,7 +13,13 @@ def addLevelMarks():
         ptB = [size, level, 0]
         stPts.append(ptA)
         rs.AddLine(ptA, ptB)
-        rs.AddText("Level " + str(i+1), rs.VectorAdd(ptA, vec1), size*.1)
+        rs.AddText("Level " + str(i+1) + ": +" + str(level), rs.VectorAdd(ptA, vec1), size*.1)
+        triPts = [[0,0,0], [size*.05, size*.1,0], [-size*.05, size*.1,0], [0,0,0]]
+        newPts = []
+        for j in range(0, 4):
+            newPts.append(rs.VectorAdd(ptA, triPts[j]))
+        tri = rs.AddPolyline(newPts)
+        rs.CloseCurve(tri)
         i=i+1
     return
 if __name__=="__main__":
