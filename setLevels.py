@@ -6,24 +6,29 @@ def setFloorLevels(numFloors):
     input: int: the number of floors
     returns: None
     """
-    levelNum = []
+    levelName = []
     levels = []
     
     for i in range(0,numFloors):
-        levelNum.append("L"+str(i+1))
+        levelName.append("L"+str(i+1))
+    levelName.append("Roof")
     
     #if existing data, get
     for i in range(0,numFloors):
-        if (rs.GetDocumentData("Levels",levelNum[i]) is not None):
-            levels.append(rs.GetDocumentData("Levels", levelNum[i]))
+        if (rs.GetDocumentData("Levels",levelName[i]) is not None):
+            levels.append(rs.GetDocumentData("Levels", levelName[i]))
         else:
             levels.append(None)
+    if (rs.GetDocumentData("Levels",levelName[-1]) is not None):
+        levels.append(rs.GetDocumentData("Levels", levelName[-1]))
+    else:
+        levels.append(None)
     rs.DeleteDocumentData("Levels")
     newLevels = []
-    newLevels = rs.PropertyListBox(levelNum, levels, "LEVELS", "Update the Levels below")
+    newLevels = rs.PropertyListBox(levelName, levels, "LEVELS", "Update the Levels below")
     
-    for i in range(0,numFloors):
-        rs.SetDocumentData("Levels", levelNum[i], str(newLevels[i]))
+    for i in range(0,numFloors+1):
+        rs.SetDocumentData("Levels", levelName[i], str(newLevels[i]))
     return None
 def getFloorLevels():
     """
@@ -32,12 +37,14 @@ def getFloorLevels():
     returns: List of levels
     """
     numFloors = getNumFloors()
-    levelNum = []
+    levelName = []
     levels = []
     
     for i in range(0,numFloors):
-        levelNum.append("L"+str(i+1))
-        levels.append(float(rs.GetDocumentData("Levels", levelNum[i])))
+        levelName.append("L"+str(i+1))
+        levels.append(float(rs.GetDocumentData("Levels", levelName[i])))
+    levelName.append("Roof")
+    levels.append(float(rs.GetDocumentData("Levels", levelName[-1])))
     
     return levels
 def setNumFloors():
