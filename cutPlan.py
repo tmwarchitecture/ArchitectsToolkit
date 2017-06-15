@@ -23,6 +23,8 @@ def cutAtPlan(level, floorNum):
         if rs.IsBrep(obj):
             tempCrv = rs.IntersectBreps(obj, planPlane)
         if tempCrv != None:
+            objName = rs.ObjectName(obj)
+            rs.ObjectName(tempCrv, objName)
             intersectCrvs.append(tempCrv)
     
     for crv in intersectCrvs:
