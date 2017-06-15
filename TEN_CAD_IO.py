@@ -45,7 +45,24 @@ def exportPlanToCAD(chosenLevel, path):
             objects.append(tempObject)
     if objects is None:
         return
+    
     scaledObjects = rs.ScaleObjects(objects, [0,0,0], [1000,1000,0], copy=True)
+    
+#    #Format Coordinate
+#    rawCoordinate = rs.GetDocumentData("Project Info", "CAD coordinate")
+#    coordinate = rawCoordinate.split(",")
+#    try:
+#        for i in range(0, 3):
+#            coordinate[i] = float(coordinate[i])
+#    except:
+#            coordinate = None
+#    if coordinate is None:
+#        print "CAD coordinate has an error"
+#    
+#    else: #move all objects
+#        negVec = rs.VectorReverse(coordinate)
+#        rs.MoveObjects(scaledObjects, coordinate)
+    
     
     rs.UnitSystem(2)
     
@@ -86,6 +103,7 @@ def exportAllPlansToCAD():
 def importTEN_CAD():
     savePath0 = rs.OpenFileName("Open", "Autocad (*.dwg)|*.dwg||")
     explodeBlockBoo = True
+    
     if savePath0 is None:
         return
     rs.EnableRedraw(False)
@@ -134,7 +152,6 @@ def importTEN_CAD():
     #get intial list of all layers in the file
     currentLayers = rs.LayerNames()
     
-    #
     #rs.UnitSystem(4)
     rs.Command('_-Import '+savePath1+' _Enter')
     #rs.Command('_selLast')
@@ -147,6 +164,10 @@ def importTEN_CAD():
     #newLayers = [item for item in currentLayers if item not in endLayersNames]
     newLayers = diff(endLayersNames, currentLayers)
     print newLayers
+    
+    
+    
+    
     for layer in newLayers:
         rs.ParentLayer(layer, element)
         objects = rs.ObjectsByLayer(layer)
@@ -158,7 +179,29 @@ def importTEN_CAD():
                     rs.DeleteObject(obj)
                 elif rs.IsHatch(obj):
                     rs.DeleteObject(obj)
-    #Rhino.DocObjects.Layer.IsExpanded(
+    
+    #Get all the imported geometry
+    allObjects = []
+    finalLayers = rs.LayerChildren(rs.CurrentLayer())
+    for finalLayer in finalLayers:
+        allObjects.append(rs.ObjectsByLayer(finalLayer))
+    finalAllObjects = [item for sublist in allObjects for item in sublist]
+    
+    #Format Coordinate
+    rawCoordinate = rs.GetDocumentData("Project Info", "CAD coordinate")
+    coordinate = rawCoordinate.split(",")
+    try:
+        for i in range(0, 3):
+            coordinate[i] = float(coordinate[i])
+    except:
+            coordinate = None
+    if coordinate is None:
+        print "CAD coordinate has an error"
+    
+    else: #move all objects
+        negVec = rs.VectorReverse(coordinate)
+        rs.MoveObjects(finalAllObjects, negVec)
+    
     print "Import EXECUTED"
     rs.EnableRedraw(True)
     return None
@@ -168,8 +211,10 @@ if __name__=="__main__":
     if (type == 0):
         exportTEN_CAD()
     elif (type == 1):
+        #Import CAD
         importTEN_CAD()
     elif (type == 2):
+        #Export All plans
         if rs.IsLayer("60_PLANS"):
             children = rs.LayerChildren("60_PLANS")
             items = []

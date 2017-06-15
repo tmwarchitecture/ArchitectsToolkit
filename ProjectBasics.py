@@ -1,8 +1,7 @@
 import rhinoscriptsyntax as rs
 
 def main():
-    rs.Prompt("Hello")
-    items = ["Project Name", "Project Location", "Plot Ratio", "Min Green Coverage", "Max Site Coverage"]
+    items = ["Project Name", "Project Location", "Plot Ratio", "Min Green Coverage", "Max Site Coverage", "CAD coordinate"]
     values = []
     if rs.GetDocumentData("Project Info", items[0]) is not None:
         for i in range(0,len(items)):
