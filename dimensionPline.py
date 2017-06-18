@@ -14,7 +14,7 @@ def dimensionPline(pline, offsetDist):
         offsetPt = rs.VectorAdd(stPt, offsetVec)
         dim = rs.AddAlignedDimension(stPt, endPt, rs.coerce3dpoint(offsetPt))
         root = rs.AddLayer("80_LAYOUT")
-        dimsLayer = rs.AddLayer("DIMS", parent = root)
+        dimsLayer = rs.AddLayer("DIMS", parent = root, color = (100,100,100))
         rs.ObjectLayer(dim, dimsLayer)
     rs.DeleteObjects(segments)
     return
