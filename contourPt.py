@@ -2,7 +2,12 @@ import rhinoscriptsyntax as rs
 
 
 def contourPt(obj, pt):
-    planPlane = rs.AddPlaneSurface([-1000,-1000,pt[2]], 3000, 3000)
+    """
+    creates a contour according to xy plane at specified height
+    obj: single object to contour
+    pt: a point to contour at
+    """
+    planPlane = rs.AddPlaneSurface([-10000,-10000,pt[2]], 30000, 30000)
     intersectCrvs = []
     tempCrv = None
     
@@ -12,7 +17,9 @@ def contourPt(obj, pt):
         objName = rs.ObjectName(obj)
         rs.ObjectName(tempCrv, objName)
         intersectCrvs.append(tempCrv)
+        rs.MatchObjectAttributes(tempCrv, obj)
     rs.DeleteObject(planPlane)
+    return intersectCrvs
 
 def main():
     objs = rs.GetObjects("Select objects to contour", preselect = True)
