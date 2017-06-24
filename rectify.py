@@ -17,17 +17,27 @@ def roundedDist(numList, decPlaces):
     return numList
 def rectify(pline, decPlaces):
     """
+    --Uses your current cplane as guides
     pline: one pline to rectify
     decPlace: number of decimals to round to (1 = 100mm, 2 = 10mm, 3 = 1mm)
     """
     rs.EnableRedraw(False)
     
+    #Remove colinear points
     rs.SimplifyCurve(pline)
+    
+    #orient to world
+    xPt = rs.VectorAdd(rs.ViewCPlane().Origin, rs.ViewCPlane().XAxis)
+    yPt = rs.VectorAdd(rs.ViewCPlane().Origin, rs.ViewCPlane().YAxis)
+    origCplane = [rs.ViewCPlane().Origin, xPt , yPt]
+    world = [[0,0,0], [1,0,0], [0,1,0]] 
+    rs.OrientObject(pline, origCplane, world)
+    
+    #get ctrl Pts
     ctrlPts = rs.CurvePoints(pline)
     
     #test if closed
     closedBool = rs.IsCurveClosed(pline)
-    
     if closedBool:
         del ctrlPts[-1]
     
@@ -75,15 +85,24 @@ def rectify(pline, decPlaces):
             else:
                 newPts.append(rs.coerce3dpoint([xVals[int(i/2-.5)], yVals[int(i/2+.5)], 0]))
     
+    #Close it
     if closedBool:
         if xDir:
             newPts[-1].X = newPts[0].X
         else:
             newPts[-1].Y = newPts[0].Y
         newPts.append(newPts[0])
+    
+    #make new Line
     newLine = rs.AddPolyline(newPts)
+    
+    #Cleanup
     objectsLay = rs.MatchObjectAttributes(newLine, pline)
     rs.DeleteObject(pline)
+    
+    #Move back to original cplane
+    rs.OrientObject(newLine, world, origCplane)
+    
     rs.EnableRedraw(True)
     return newLine
 def main():
