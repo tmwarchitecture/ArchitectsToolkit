@@ -1,8 +1,11 @@
 import rhinoscriptsyntax as rs
-import Rhino
 
 def dimensionPline(pline, offsetDist):
     segments = []
+    objLayer = rs.ObjectLayer(pline)
+    objParent = rs.ParentLayer(objLayer)
+    dimGroup = rs.AddGroup("Pline Dims")
+    dimsLayer = rs.AddLayer("DIMS", parent = objParent, color = (100,100,100))
     segments = rs.ExplodeCurves(pline)
     for seg in segments:
         endPt = rs.CurveEndPoint(seg)
@@ -13,9 +16,8 @@ def dimensionPline(pline, offsetDist):
         offsetVec = rs.VectorScale(offsetVec, offsetDist)
         offsetPt = rs.VectorAdd(stPt, offsetVec)
         dim = rs.AddAlignedDimension(stPt, endPt, rs.coerce3dpoint(offsetPt))
-        root = rs.AddLayer("80_LAYOUT")
-        dimsLayer = rs.AddLayer("DIMS", parent = root, color = (100,100,100))
         rs.ObjectLayer(dim, dimsLayer)
+        rs.AddObjectToGroup(dim, dimGroup)
     rs.DeleteObjects(segments)
     return
 
