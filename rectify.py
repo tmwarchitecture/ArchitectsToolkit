@@ -1,6 +1,5 @@
 import rhinoscriptsyntax as rs
-#import plineCoords
-#import dimensionPline as dp
+
 def roundedDist(numList, decPlaces):
     """
     :param numList: list of floats to round
@@ -98,7 +97,8 @@ def rectify(pline, decPlaces):
     
     #Cleanup
     objectsLay = rs.MatchObjectAttributes(newLine, pline)
-    rs.DeleteObject(pline)
+    rs.ObjectColor(pline, (255,0,0))
+    #rs.DeleteObject(pline)
     
     #Move back to original cplane
     rs.OrientObject(newLine, world, origCplane)
@@ -111,7 +111,5 @@ def main():
         return
     for obj in objs:
         newLine = rectify(obj, 1)
-        #dp.dimensionPline(newLine, 2)
-        #plineCoords.plineCoordinate(newLine)
 if __name__=="__main__":
     main()
