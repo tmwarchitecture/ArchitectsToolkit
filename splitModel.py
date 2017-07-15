@@ -9,7 +9,7 @@ def splitModel(objs, cutLevel):
     
     belowDir = rs.AddLine(point, [0,0,-9999])
     aboveDir = rs.AddLine(point, [0,0,9999])
-    circle = rs.AddCircle(point, 99)
+    circle = rs.AddCircle(point, 9999)
     circleSrf = rs.AddPlanarSrf(circle)
     
     aboveGroup = rs.AddGroup("Above")
@@ -22,22 +22,26 @@ def splitModel(objs, cutLevel):
         if ptBtm[2]>cutLevel:
             intersecting = False
             rs.AddObjectToGroup(obj, "Above")
-            print "Object Above"
+            #print "Object Above"
         elif ptTop[2]<cutLevel:
             intersecting = False
             rs.AddObjectToGroup(obj, "Below")
-            print "Object Below"
+            #print "Object Below"
         else:
             intersecting = True
         
         if intersecting:
-            if rs.IsSurface(obj):
+            if rs.IsBrep(obj):
+                closed = False
+                if rs.IsPolysurfaceClosed(obj):
+                    closed = True
                 try:
                     copy = rs.CopyObject(obj)
                     splitSrfs = rs.SplitBrep(obj, circleSrf, True)
-                    print len(splitSrfs)
                     for splitSrf in splitSrfs:
-                        print "looping"
+                        #print "looping"
+                        if closed:
+                            rs.CapPlanarHoles(splitSrf)
                         rs.MatchObjectAttributes(splitSrf, copy)
                         ptBtm = rs.BoundingBox(splitSrf)[0]
                         ptTop = rs.BoundingBox(splitSrf)[6]
@@ -50,16 +54,20 @@ def splitModel(objs, cutLevel):
                     rs.DeleteObject(obj)
                 except:
                     None
-            
+            if rs.IsBlockInstance(obj):
+                contents = rs.ExplodeBlockInstance(obj)
+                for content in contents:
+                    objs.append(content)
     rs.DeleteObject(belowDir)
     rs.DeleteObject(aboveDir)
     rs.DeleteObject(circle)
     rs.DeleteObject(circleSrf)
     rs.EnableRedraw(True)
+    #rs.HideGroup("Above")
 
 def main():
     objs = rs.VisibleObjects()
-    cutLevel = 20
+    cutLevel = 7
     splitModel(objs, cutLevel)
 
 main()
