@@ -1,10 +1,7 @@
 import rhinoscriptsyntax as rs
 import Rhino
 
-
-
 def splitModel(objs, cutLevel):
-    rs.EnableRedraw(False)
     point = Rhino.Geometry.Point3d(0,0,cutLevel)
     
     belowDir = rs.AddLine(point, [0,0,-9999])
@@ -62,12 +59,13 @@ def splitModel(objs, cutLevel):
     rs.DeleteObject(aboveDir)
     rs.DeleteObject(circle)
     rs.DeleteObject(circleSrf)
-    rs.EnableRedraw(True)
-    #rs.HideGroup("Above")
 
 def main():
     objs = rs.VisibleObjects()
-    cutLevel = 7
-    splitModel(objs, cutLevel)
+    cutLevel = 12
+    rs.EnableRedraw(False)
+    objsCopy = rs.CopyObjects(objs)
+    splitModel(objsCopy, cutLevel)
+    rs.EnableRedraw(True)
 
 main()
