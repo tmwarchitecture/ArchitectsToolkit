@@ -23,9 +23,12 @@ def setFloorLevels(numFloors):
         levels.append(rs.GetDocumentData("Levels", levelName[-1]))
     else:
         levels.append(None)
-    rs.DeleteDocumentData("Levels")
+    #rs.DeleteDocumentData("Levels")
     newLevels = []
     newLevels = rs.PropertyListBox(levelName, levels, "LEVELS", "Update the Levels below")
+    
+    if newLevels is None:
+        return
     
     for i in range(0,numFloors+1):
         rs.SetDocumentData("Levels", levelName[i], str(newLevels[i]))
