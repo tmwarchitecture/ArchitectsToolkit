@@ -22,6 +22,11 @@ def areaTag(pline):
     areaTag = rs.AddText(text, pt, 1, justification = 131074)
     rs.DeleteObject(pt)
     
+    parentLayer = rs.ParentLayer(rs.ObjectLayer(pline))
+    hostLayer = rs.AddLayer("ANNO_AREA", (128,128,128), parent = parentLayer)
+    rs.ObjectLayer(areaTag, hostLayer)
+    
+    
     te = rs.coercerhinoobject(areaTag, True, True)
     te.Geometry.TextFormula = text
     te.CommitChanges()
