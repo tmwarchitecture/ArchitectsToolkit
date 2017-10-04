@@ -24,6 +24,9 @@ def nameTag(pline):
     #areaTag = rs.AddTextDot(area, pt)
     rs.DeleteObject(pt)
     
+    parentLayer = rs.ParentLayer(rs.ObjectLayer(pline))
+    hostLayer = rs.AddLayer("ANNO_NAME", (128,128,128), parent = parentLayer)
+    rs.ObjectLayer(areaTag, hostLayer)
     
     #te = rs.coercerhinoobject(id, True, True)
     #te.Geometry.TextFormula = text
