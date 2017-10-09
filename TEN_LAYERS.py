@@ -23,7 +23,7 @@ def addLayerFromCSV(layNumList):
     Input: int - list of Layer numbers, associated with CSV layer number
     Returns: None
     """
-    rhinoLayerFilePath = "C:\\Users\\Tim\\Desktop\\temp\\RhinoLayersV3.csv"
+    rhinoLayerFilePath = "Q:\\Staff Postbox\\Tim Williams\\10 DESIGN LAYERS\\dev\\LAYERS\\RhinoLayersV3.csv"
     
     #Read the CSV
     file = open(rhinoLayerFilePath, "r")
@@ -33,6 +33,10 @@ def addLayerFromCSV(layNumList):
     #Variables
     RhinoLayerCol = 1
     ColorCol = 3
+    MaterialCol = 4
+    LinetypeCol = 5
+    PrintColorCol = 6
+    PrintWidthCol = 7
     found = False
     
     allLayerInfo = []
@@ -48,24 +52,57 @@ def addLayerFromCSV(layNumList):
                 if len(nameCol)<1:
                     break
                 thisLayInfo.append(row.split(",")[RhinoLayerCol])
+                
+                
+                #Linetype
+                LinetypeRaw = row.split(",")[LinetypeCol]
+                if len(LinetypeRaw)>1:
+                    Linetype = LinetypeRaw
+                else:
+                    Linetype = "Continuous"
+                
+                #Layer Color
                 LayColorRaw = row.split(",")[ColorCol]
                 if len(LayColorRaw)>1:
                     LayColor = (int(LayColorRaw.split("-")[0]),int(LayColorRaw.split("-")[1]),int(LayColorRaw.split("-")[2]))
                 else:
                     LayColor = (0,0,0)
+                
+                #Print Color
+                PrintColorRaw = row.split(",")[PrintColorCol]
+                if len(PrintColorRaw)>1:
+                    PrintColor = (int(PrintColorRaw.split("-")[0]),int(PrintColorRaw.split("-")[1]),int(PrintColorRaw.split("-")[2]))
+                else:
+                    PrintColor = (0,0,0)
+                
+                #Print Width
+                PrintWidthRaw = row.split(",")[PrintWidthCol]
+                if len(PrintWidthRaw)>1:
+                    PrintWidth = float(PrintWidthRaw)
+                else:
+                    PrintWidth = float(0)
+                
                 thisLayInfo.append(LayColor)
+                thisLayInfo.append(PrintColor)
+                thisLayInfo.append(Linetype)
+                thisLayInfo.append(PrintWidth)
                 allLayerInfo.append(thisLayInfo)
                 found = True
                 break
     if not found:
         return None
     
-    #Add Layer
+    #Find root layer
+    root = rs.LayerName(rs.CurrentLayer()).split("::")[0]
+    #print root
     
+    #Add Layer
     parent = None
     for eachItem in allLayerInfo:
         parent = rs.AddLayer(eachItem[0], color = eachItem[1], parent = parent)
-    
+        rs.LayerPrintColor(parent, eachItem[2])
+        rs.LayerLinetype(parent, eachItem[3])
+        rs.LayerPrintWidth(parent, eachItem[4])
     return parent
 
 def main():
@@ -91,7 +128,7 @@ def main():
     
     for num in layerNumbers:
         allNumbers = getParentLayNumbers(num)
-        print addLayerFromCSV(allNumbers)
+        addLayerFromCSV(allNumbers)
     
     rs.EnableRedraw(True)
 
