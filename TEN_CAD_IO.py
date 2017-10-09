@@ -5,20 +5,6 @@ def diff(list1, list2):
     c = set(list1).union(set(list2))
     d = set(list1).intersection(set(list2))
     return list(c - d)
-def renameToTEN(layers):
-    nameDict = {
-    "OFFICE_01":"A-AREA-0001-BNDY",
-    "RETAIL_01":"A-AREA-0002-BNDY",
-    "CIRC_01":"A-AREA-0003-BNDY"
-    }
-    names = []
-    rootLevel = layers[0].split("::")[0] + "::" + layers[0].split("::")[1] + "::"
-    for layer in layers:
-        newLayName = nameDict.get(rs.LayerName(layer, fullpath=False),rs.LayerName(layer, fullpath=False))
-        rs.RenameLayer(layer, newLayName)
-        names.append(newLayName)
-    #names = layers
-    return names
 def exportTEN_CAD():
     a = rs.GetObjects("Select Objects", preselect = "True")
     b = rs.ScaleObjects(a, [0,0,0], [1000,1000,0], copy=True)
@@ -35,9 +21,8 @@ def exportTEN_CAD():
 def exportPlanToCAD(chosenLevel, path):
     
     #Make sure layer is visible
-    rs.LayerVisible("60_PLANS", True)
-    chosenChildren = rs.LayerChildren("60_PLANS::"+chosenLevel)
-    chosenChildren = renameToTEN(chosenChildren)
+    rs.LayerVisible("6_DRAWINGS", True)
+    chosenChildren = rs.LayerChildren("6_DRAWINGS::"+chosenLevel)
     objects = []
     for chosenChild in chosenChildren:
         tempObjects = rs.ObjectsByLayer(chosenChild)
@@ -48,20 +33,20 @@ def exportPlanToCAD(chosenLevel, path):
     
     scaledObjects = rs.ScaleObjects(objects, [0,0,0], [1000,1000,0], copy=True)
     
-#    #Format Coordinate
-#    rawCoordinate = rs.GetDocumentData("Project Info", "CAD coordinate")
-#    coordinate = rawCoordinate.split(",")
-#    try:
-#        for i in range(0, 3):
-#            coordinate[i] = float(coordinate[i])
-#    except:
-#            coordinate = None
-#    if coordinate is None:
-#        print "CAD coordinate has an error"
-#    
-#    else: #move all objects
-#        negVec = rs.VectorReverse(coordinate)
-#        rs.MoveObjects(scaledObjects, coordinate)
+    #Format Coordinate
+    #    rawCoordinate = rs.GetDocumentData("Project Info", "CAD coordinate")
+    #    coordinate = rawCoordinate.split(",")
+    #    try:
+    #        for i in range(0, 3):
+    #            coordinate[i] = float(coordinate[i])
+    #    except:
+    #            coordinate = None
+    #    if coordinate is None:
+    #        print "CAD coordinate has an error"
+    #    
+    #    else: #move all objects
+    #        negVec = rs.VectorReverse(coordinate)
+    #        rs.MoveObjects(scaledObjects, coordinate)
     
     
     rs.UnitSystem(2)
@@ -74,8 +59,8 @@ def exportPlanToCAD(chosenLevel, path):
     print "Exported"
     return None
 def exportAllPlansToCAD():
-    if rs.IsLayer("60_PLANS"):
-        children = rs.LayerChildren("60_PLANS")
+    if rs.IsLayer("6_DRAWINGS"):
+        children = rs.LayerChildren("6_DRAWINGS")
         items = []
         for child in children:
             items.append(rs.LayerName(child, False))
@@ -108,8 +93,8 @@ def importTEN_CAD():
         return
     rs.EnableRedraw(False)
     
-    rs.AddLayer("70_REF")
-    rs.AddLayer("CAD", parent = "70_REF")
+    rs.AddLayer("7_REF")
+    rs.AddLayer("CAD", parent = "7_REF")
     
     fileNameExt = savePath0.split('\\')[-1]
     fileName = fileNameExt.split('.')[0]
@@ -128,7 +113,7 @@ def importTEN_CAD():
         day = "0"+str(now.day)
     time = str(now.year)+month+day
     layerName = time+"_"+fileName+"_01"
-    children = rs.LayerChildren("70_REF::CAD")
+    children = rs.LayerChildren("7_REF::CAD")
     finalNums = []
     for child in children:
         num = rs.LayerName(child, fullpath = False).split("_")[-1]
@@ -137,14 +122,14 @@ def importTEN_CAD():
         except:
             finalNums.append(0)
     finalNums.sort()
-    if rs.IsLayer("70_REF::CAD::"+layerName):
+    if rs.IsLayer("7_REF::CAD::"+layerName):
         num = int(finalNums[-1])+1
         if len(str(num))<2:
             finalNum = "0" + str(num)
         else:
             finalNum = str(num)
         layerName = time+"_"+fileName+ "_" + finalNum
-    par = rs.AddLayer("70_REF")
+    par = rs.AddLayer("7_REF")
     cat = rs.AddLayer("CAD", parent = par)
     element = rs.AddLayer(layerName, parent = cat)
     rs.CurrentLayer(element)
@@ -215,8 +200,8 @@ if __name__=="__main__":
         importTEN_CAD()
     elif (type == 2):
         #Export All plans
-        if rs.IsLayer("60_PLANS"):
-            children = rs.LayerChildren("60_PLANS")
+        if rs.IsLayer("6_DRAWINGS"):
+            children = rs.LayerChildren("6_DRAWINGS")
             items = []
             for child in children:
                 items.append(rs.LayerName(child, False))
