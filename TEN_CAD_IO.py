@@ -87,12 +87,17 @@ def exportAllPlansToCAD():
     return
 def importTEN_CAD():
     savePath0 = rs.OpenFileName("Open", "Autocad (*.dwg)|*.dwg||")
+    items = [ ["Units", "Meters", "Millimeters"] ]
+    defaults = [False]
+    CADinMilli = rs.GetBoolean("Is that CAD file in meters or mm?", items, defaults)[0]
+    
     explodeBlockBoo = True
     
     if savePath0 is None:
         return
     rs.EnableRedraw(False)
     
+    #setup the layers
     rs.AddLayer("7_REF")
     rs.AddLayer("CAD", parent = "7_REF")
     
@@ -137,12 +142,7 @@ def importTEN_CAD():
     #get intial list of all layers in the file
     currentLayers = rs.LayerNames()
     
-    #rs.UnitSystem(4)
     rs.Command('_-Import '+savePath1+' _Enter')
-    #rs.Command('_selLast')
-    #objs = rs.GetObjects(' ', preselect = True)
-    #rs.ScaleObjects(objs, [0,0,0], [.001,.001,0], copy=False)
-    #rs.UnitSystem(2)
     
     #get new layers added
     endLayersNames = rs.LayerNames()
@@ -173,8 +173,14 @@ def importTEN_CAD():
     finalAllObjects = [item for sublist in allObjects for item in sublist]
     
     #Format Coordinate
-    rawCoordinate = rs.GetDocumentData("Project Info", "CAD coordinate")
+    try:
+        rawCoordinate = rs.GetDocumentData("Project Info", "CAD coordinate")
+    except:
+        print "No CAD Coordinate specified in the Project Info"
+        rawCoordinate = (0,0,0)
     coordinate = rawCoordinate.split(",")
+    print "Aa"
+    
     try:
         for i in range(0, 3):
             coordinate[i] = float(coordinate[i])
@@ -187,6 +193,14 @@ def importTEN_CAD():
         negVec = rs.VectorReverse(coordinate)
         rs.MoveObjects(finalAllObjects, negVec)
     
+    if CADinMilli:
+        rs.ScaleObjects(finalAllObjects, [0,0,0], [.001, .001, .001])
+    
+    importGroup = rs.AddGroup(str(layerName))
+    
+    rs.AddObjectsToGroup(finalAllObjects, importGroup)
+    
+    rs.ZoomSelected()
     print "Import EXECUTED"
     rs.EnableRedraw(True)
     return None
