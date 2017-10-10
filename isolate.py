@@ -6,15 +6,13 @@ def isolateLayerObjects():
     input: None
     return: None
     """
-    obj = rs.GetObject("Select object on layer to isolate")
-    if obj is None: return
+    objs = rs.GetObjects("Select object on layer to isolate", preselect = True )
+    if objs is None: return
     
     rs.EnableRedraw(False)
-    layer = rs.ObjectLayer(obj)
-    
-    objects = rs.ObjectsByLayer(layer)
-    
-    rs.SelectObjects(objects)
+    layersToKeep = []
+    for obj in objs:
+        rs.SelectObjects(rs.ObjectsByLayer(rs.ObjectLayer(obj)))
     
     objs2keep = rs.InvertSelectedObjects()
     if objs2keep is None: return
