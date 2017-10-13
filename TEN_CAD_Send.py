@@ -1,7 +1,10 @@
 import rhinoscriptsyntax as rs
 
 def send2CAD(objs, newCoord, CADinMeters):
-    transVec = rs.VectorScale(newCoord, .001)
+    if CADinMeters:
+        transVec = rs.VectorCreate(newCoord, [0,0,0])
+    else:
+        transVec = rs.VectorScale(newCoord, .001)
     newObjs = rs.CopyObjects(objs, transVec)
     
     if CADinMeters:
@@ -27,12 +30,15 @@ def main():
     CADinMeters = rs.GetBoolean("Autocad DWG units", items, defaults)[0]
     if CADinMeters is None:
         return
-    coordRaw = rs.GetDocumentData("Project Info", "CAD coordinate (mm)")
+    coordRaw = rs.GetDocumentData("Project Info", "CAD coordinate (X,Y,Z)")
     if len(coordRaw) == 0:
         print "You have not specified a CAD Coordinate. Sending to 0,0,0."
         coord = [0,0,0]
     else:
-        coord = coordRaw.split(',')
+        coordTemp = coordRaw.split(',')
+        coord = []
+        for x in coordTemp:
+            coord.append(float(x.lstrip()))
     send2CAD(objs, coord, CADinMeters)
 
 main()
