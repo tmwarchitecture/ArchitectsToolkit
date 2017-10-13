@@ -174,7 +174,7 @@ def importTEN_CAD():
     
     #Format Coordinate
     try:
-        rawCoordinate = rs.GetDocumentData("Project Info", "CAD coordinate")
+        rawCoordinate = rs.GetDocumentData("Project Info", "CAD coordinate (X,Y,Z)")
     except:
         print "No CAD Coordinate specified in the Project Info"
         rawCoordinate = (0,0,0)
