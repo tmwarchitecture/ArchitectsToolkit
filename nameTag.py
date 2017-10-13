@@ -1,41 +1,25 @@
 import rhinoscriptsyntax as rs
-import scriptcontext as sc
-import Rhino
-def nameTag(pline):
-    #get area
-    #area = rs.CurveArea(pline)[0]
-    #area = str((int(area*100))/100) + "/2 = " + str(((int(area*100))/100)/2)
-    #area = str((int(area*100))/100) + "m2"
-    #print area
+
+def nameTag(obj):
+    roomName = rs.ObjectName(obj)
     
-    roomName = rs.ObjectName(pline)
-    #add hatch
-    #hatch = rs.AddHatch(pline)
-    #rs.ObjectColor(hatch, color = [100,100,100])
-    
-    #add text tag
-    #objID = pline
     try:
         text = str(roomName)
-        pt = rs.AddPoint(rs.CurveAreaCentroid(pline)[0])
+        pt0 = rs.BoundingBox(obj)[0]
+        pt2 = rs.BoundingBox(obj)[2]
+        pt = rs.PointDivide(rs.PointAdd(pt0, pt2), 2)
         areaTag = rs.AddText(text, pt, 1, justification = 131074)
     except:
         print "Object has no name"
-    #areaTag = rs.AddTextDot(area, pt)
-    rs.DeleteObject(pt)
+        return
     
-    parentLayer = rs.ParentLayer(rs.ObjectLayer(pline))
+    parentLayer = rs.ParentLayer(rs.ObjectLayer(obj))
     hostLayer = rs.AddLayer("ANNO_NAME", (128,128,128), parent = parentLayer)
     rs.ObjectLayer(areaTag, hostLayer)
-    
-    #te = rs.coercerhinoobject(id, True, True)
-    #te.Geometry.TextFormula = text
-    #te.CommitChanges()
-    #sc.doc.Views.Redraw()
     return None
 
 def main():
-    pline = rs.GetObjects("Select Curve", preselect = True)
+    pline = rs.GetObjects("Select Objects to add name tag to", preselect = True)
     if pline is None:
         return None
     rs.EnableRedraw(False)

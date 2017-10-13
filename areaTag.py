@@ -17,6 +17,7 @@ def areaTag(pline):
     #add text tag
     objID = pline
     text = '%<area("'+ str(objID) +'")>%m2'
+    
     pt = rs.AddPoint(rs.CurveAreaCentroid(pline)[0])
     rs.MoveObject(pt, offset)
     areaTag = rs.AddText(text, pt, 1, justification = 131074)
@@ -34,7 +35,7 @@ def areaTag(pline):
     return None
 
 def main():
-    pline = rs.GetObjects("Select Curve", preselect = True)
+    pline = rs.GetObjects("Select curves to add area tag", preselect = True)
     if pline is None:
         return None
     #rs.EnableRedraw(False)
